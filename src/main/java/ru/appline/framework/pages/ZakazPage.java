@@ -3,6 +3,7 @@ package ru.appline.framework.pages;
 import org.openqa.selenium.Keys;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
+import org.openqa.selenium.support.ui.ExpectedConditions;
 import ru.appline.framework.utils.ConstConteiner;
 
 import java.util.List;
@@ -39,19 +40,19 @@ public class ZakazPage extends BasePage {
             }
         }
         if (status = false) {
-            System.out.println("Данные доп гарантии заполнены неправильно");
+            throw new AssertionError("Данные доп гарантии заполнены неправильно");
         }
         return this;
     }
 
     public ZakazPage writeCostPS() {
-        productCost.isDisplayed();
+        wait.until(ExpectedConditions.visibilityOf(productCost));
         ConstConteiner.psCost = strToInt(productCost);
         return this;
     }
 
     public ZakazPage writeCostPSWithGuarantee() {
-        productCostWithG.isDisplayed();
+        wait.until(ExpectedConditions.visibilityOf(productCostWithG));
         ConstConteiner.psCostWithGuarantee = strToInt(productCostWithG);
         return this;
     }
@@ -72,15 +73,15 @@ public class ZakazPage extends BasePage {
     }
 
     public ZakazPage writeCostDetroit() {
-        productCost.isDisplayed();
+        wait.until(ExpectedConditions.visibilityOf(productCost));
         ConstConteiner.detCost = strToInt(productCost);
         return this;
     }
 
     public ZakazPage checkCost() {
         Integer temp = strToInt(basket);
-      wait.until(textNotToBePresentInElement(basket,temp));
-        if (ConstConteiner.detCost + ConstConteiner.psCostWithGuarantee != strToInt(basket)) {
+        if (textNotToBePresentInElement(basket, temp)
+                && (ConstConteiner.detCost + ConstConteiner.psCostWithGuarantee != strToInt(basket))) {
             throw new AssertionError("Цена не совпадает");
         }
         return this;

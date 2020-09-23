@@ -1,11 +1,9 @@
 package ru.appline.framework.pages;
 
 import org.openqa.selenium.JavascriptExecutor;
-import org.openqa.selenium.StaleElementReferenceException;
-import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.PageFactory;
-import org.openqa.selenium.support.ui.ExpectedCondition;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 import ru.appline.framework.managers.ManagerPages;
@@ -17,7 +15,7 @@ public class BasePage {
 
     protected JavascriptExecutor js = (JavascriptExecutor) getDriver();
 
-    protected WebDriverWait wait = new WebDriverWait(getDriver(), 50, 1000);
+    protected WebDriverWait wait = new WebDriverWait(getDriver(), 16, 200);
 
     public BasePage() {
         PageFactory.initElements(getDriver(), this);
@@ -39,23 +37,6 @@ public class BasePage {
         field.sendKeys(value);
     }
 
-    public void fillDateField(WebElement field, String value) {
-        scrollToElementJs(field);
-        field.sendKeys(value);
-    }
-
-    private void elementToBeVisible(WebElement element) {
-        wait.until(ExpectedConditions.visibilityOf(element));
-    }
-
-    public void clickerV(WebElement element) {
-        if (!element.isDisplayed()) {
-            scrollToElementJs(element);
-        }
-        elementToBeVisible(element);
-        element.click();
-    }
-
     public void clicker(WebElement element) {
         if (!element.isDisplayed()) {
             scrollToElementJs(element);
@@ -70,53 +51,47 @@ public class BasePage {
         }
     }
 
-    public static ExpectedCondition<Boolean> textNotToBePresentInElement(final WebElement element, final Integer text) {
-        return new ExpectedCondition<Boolean>() {
-            public Boolean apply(WebDriver driver) {
-                try {
-                    Integer elementText = Integer.parseInt(element.getText().replaceAll("[^0-9]", ""));
-                    return !(elementText==text);
-                } catch (StaleElementReferenceException var3) {
-                    return null;
-                }
-            }
+    public Boolean textNotToBePresentInElement(final WebElement element, final Integer text) {
+        Integer elementText;
+        int i = 0;
+        do {
+            elementText = Integer.parseInt(element.getText().replaceAll("[^0-9]", ""));
+            sleeper(200);
+            i++;
+        } while (elementText == text || i < 10);
+        return true;
 
-            public String toString() {
-                return String.format("text ('%s') to be present in element %s", text, element);
-            }
-        };
-    }
-
-    public Integer strToInt(String a) {
-        return Integer.parseInt(a.replaceAll("[^0-9]", ""));
     }
 
     public Integer strToInt(WebElement a) {
         return Integer.parseInt(a.getText().replaceAll("[^0-9]", ""));
     }
-    public void oNNeTyt(WebElement a,String mess){
+
+    public void oNNeTyt(WebElement a, String mess) {
         boolean marker = true;
         try {
             a.getText();
-        } catch (Exception ex) {
+        } catch (NoSuchElementException ex) {
             marker = false;
         }
         if (marker) {
-            throw new AssertionError( mess);
+            throw new AssertionError(mess);
         }
     }
-    public void oNTyt(WebElement a, String mess){
+
+    public void oNTyt(WebElement a, String mess) {
         boolean marker = false;
         try {
             a.getText();
-        } catch (Exception ex) {
+        } catch (NoSuchElementException ex) {
             marker = true;
         }
         if (marker) {
             throw new AssertionError(mess);
         }
     }
-    public void sleeper(long a){
+
+    public void sleeper(long a) {
         try {
             Thread.sleep(a);
         } catch (InterruptedException e) {

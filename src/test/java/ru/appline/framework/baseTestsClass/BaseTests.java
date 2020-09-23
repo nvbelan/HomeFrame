@@ -7,10 +7,6 @@ import ru.appline.framework.managers.ManagerPages;
 
 public class BaseTests {
 
- /**
- * Менеджер страничек
- * @see ru.appline.framework.managers.ManagerPages#getManagerPages()
- */
 protected ManagerPages app = ManagerPages.getManagerPages();
 
 @Before
